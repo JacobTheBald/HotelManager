@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HotelManager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250301000504_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250303133602_SeedingChanges")]
+    partial class SeedingChanges
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,18 +39,56 @@ namespace HotelManager.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Size")
+                    b.Property<int>("RoomStatusId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Status")
+                    b.Property<int>("Size")
                         .HasColumnType("integer");
 
                     b.Property<string>("StatusDetails")
                         .HasColumnType("text");
 
+                    b.Property<int>("StatusId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("RoomStatusId");
+
                     b.ToTable("Rooms");
+                });
+
+            modelBuilder.Entity("HotelManager.Models.RoomStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RoomStatuses");
+                });
+
+            modelBuilder.Entity("HotelManager.Models.Room", b =>
+                {
+                    b.HasOne("HotelManager.Models.RoomStatus", "RoomStatus")
+                        .WithMany("Rooms")
+                        .HasForeignKey("RoomStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RoomStatus");
+                });
+
+            modelBuilder.Entity("HotelManager.Models.RoomStatus", b =>
+                {
+                    b.Navigation("Rooms");
                 });
 #pragma warning restore 612, 618
         }

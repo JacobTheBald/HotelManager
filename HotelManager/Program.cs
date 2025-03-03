@@ -10,24 +10,16 @@ namespace HotelManager
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
- 
-
-
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            // Configure PostgreSQL database
             var configuration = builder.Configuration;
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -39,6 +31,7 @@ namespace HotelManager
                 var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 dbContext.Database.EnsureCreated();
                 dbContext.Database.Migrate();
+                DatabaseSeeder.Seed(dbContext);
             }
 
             app.UseHttpsRedirection();
